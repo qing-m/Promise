@@ -1,7 +1,7 @@
 const PADDING = 'PADDING'
 const FULFILLED = 'FULFILLED'
 const REJECTED = 'REJECTED'
-
+let Promise2
 class Promise {
 	constructor(exception) {
 		this.status = PADDING
@@ -31,10 +31,29 @@ class Promise {
 
 	then(onFulfilled,onRejected) {
 		if(this.status === FULFILLED) {
-			onFulfilled(this.value)
+			return Promise2 = new Promise((reslove,reject) => {
+				try {
+					let x = onFulfilled(this.value)
+					reslove(x)
+				} catch (error) {
+					reject(error)
+				}
+			})
 		}
 		if(this.status === REJECTED) {
-			onRejected(this.reason)
+			return Promise2 = new Promise((reslove,reject) => {
+				try {
+					let x = onRejected(this.reason)
+					reslove(x)
+				} catch (error) {
+					reject(error)
+				}
+			})
+		}
+		if(this.status === PADDING) {
+			return Promise2 = new Promise((reslove,reject) => {
+				
+			})
 		}
 	}
 }
@@ -47,4 +66,8 @@ new Promise((reslove,reject) => {
 	console.log(`reslove ${res}`)
 },(err)=>{
 	console.log(`reject ${err}`)
+}).then((res)=>{
+	console.log(`next res`)
+},(err)=>{
+	console.log('next err')
 })
