@@ -1,12 +1,14 @@
-// 写之前要先了解Promis的用法.
-
-new Promise((reslove,reject) => {  // Promise对象接受一个函数，函数中有两个参数，当new Promise时会立即执行里面的代码
-	console.log('test1')
-	// reslove(`reslove-promise`) // 当reslove时执行的是.then的第一个参数
-	reject(`reject-promise`)  // 当reject时执行的是第二个参数
-	console.log('test2')
-}).then((res)=>{
-	console.log(`reslove ${res}`)
-},(err)=>{
-	console.log(`reject ${err}`)
-})
+// PromiseA+规范 https://promisesaplus.com/
+//先写一个简单版本
+// Promise 中有三种状态
+const PADDING = 'padding'  // 等待
+const FULFILLED = 'fulfilled' // 成功
+const REJECTED = 'rejected' // 失败
+class Promise {
+	// 在new Promise时我们会传入一个函数，而且这个函数会立即执行
+	// 首先创造一个constructor 接受一个参数
+	constructor(exception) {
+		// 传入的这个函数是要立即执行的,所以我们直接调用
+		exception()
+	}
+}
