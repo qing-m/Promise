@@ -156,3 +156,6 @@ Promise.deferred = function() {
 
 module.exports = Promise;
 
+// 测试Promise是否满足A+规范
+// npm install promises-aplus-tests -D
+// npx promises-aplus-tests promise.js
