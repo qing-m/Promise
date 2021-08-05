@@ -59,4 +59,9 @@ class Promise {
       reject(error)
     }
   }
+
+  // .then
+  then(onFulfilled, onRejected) {
+
+  }
 }
