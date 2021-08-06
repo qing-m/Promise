@@ -62,6 +62,13 @@ class Promise {
 
   // .then
   then(onFulfilled, onRejected) {
-
+    // 状态为fulfilled，执行onFulfilled，传入成功的值
+    if (this.state === 'fulfilled') {
+      onFulfilled(this.value);
+    };
+    // 状态为rejected，执行onRejected，传入失败的原因
+    if (this.state === 'rejected') {
+      onRejected(this.reason);
+    };
   }
 }
