@@ -62,6 +62,7 @@ class Promise {
 
   // .then
   then(onFulfilled, onRejected) {
+    console.info('state', this.state)
     // 状态为fulfilled，执行onFulfilled，传入成功的值
     if (this.state === 'fulfilled') {
       onFulfilled(this.value);
@@ -72,3 +73,12 @@ class Promise {
     };
   }
 }
+
+const p1 = new Promise((resolve,reject) => {
+  setTimeout(()=>{
+    resolve(1)
+  },100)
+})
+p1.then((res)=>{
+  console.log(res)
+})​​​​
