@@ -167,10 +167,17 @@ class Promise {
   }
 }
 
-new Promise((resolve, reject) => {
-  setTimeout(()=>{
-    resolve(111111111)
-  },1000)
-}).then(res=>{
-  console.log(res)
-})
+Promise.deferred = function() {
+  let defer = {};
+  defer.promise = new Promise((resolve, reject) => {
+    defer.resolve = resolve;
+    defer.reject = reject;
+  });
+  return defer;
+};
+
+module.exports = Promise;
+
+// // 测试Promise是否满足A+规范
+// // npm install promises-aplus-tests -D
+// // npx promises-aplus-tests promise.js
