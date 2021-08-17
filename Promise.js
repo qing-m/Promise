@@ -65,24 +65,32 @@ class Promise {
 
   // .then
   then(onFulfilled, onRejected) {
-    // 状态为fulfilled，执行onFulfilled，传入成功的值
-    if (this.state === FULFILLED) {
-      onFulfilled(this.value);
-    };
-    // 状态为rejected，执行onRejected，传入失败的原因
-    if (this.state === REJECTED) {
-      onRejected(this.reason);
-    };
-    if(this.state === PENDING) {
-      // onFulfilled传入到成功数组
-      this.onResolvedCallbacks.push(()=>{
-        onFulfilled(this.value);
-      })
-      // onRejected传入到失败数组
-      this.onRejectedCallbacks.push(()=>{
-        onRejected(this.reason);
-      })
-    }
+    // 根据PromiseA+规范 生命返回的promise2 链式调用
+    let promise2 = new Promise((resolve,reject) => {
+      // 状态为fulfilled，执行onFulfilled，传入成功的值
+      if (this.state === FULFILLED) {
+        let x = onFulfilled(this.value)
+        // resolvePromise函数，处理自己return的promise和默认的promise2的关系
+        resolvePromise(promise2, x, resolve, reject);
+      };
+      // 状态为rejected，执行onRejected，传入失败的原因
+      if (this.state === REJECTED) {
+        let x = onRejected(this.reason);
+        resolvePromise(promise2, x, resolve, reject);
+      };
+      if(this.state === PENDING) {
+        // onFulfilled传入到成功数组
+        this.onResolvedCallbacks.push(()=>{
+          let x = onFulfilled(this.value);
+          resolvePromise(promise2, x, resolve, reject);
+        })
+        // onRejected传入到失败数组
+        this.onRejectedCallbacks.push(()=>{
+          let x = onRejected(this.reason);
+          resolvePromise(promise2, x, resolve, reject);
+        })
+      }
+    })
   }
 }
 
