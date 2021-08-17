@@ -1,8 +1,3 @@
-/*
- * @Author: WangHeYao
- * @Date: 2021-08-04 13:58:06
- */
-
 // 首先Promise是这样使用的
 // new Promise((resolve,reject)=>{......})
 
@@ -12,7 +7,7 @@
 // 失败时，不可转为其他状态，且必须有一个不可改变的原因（reason）
 // new Promise((resolve, reject)=>{resolve(value)}) resolve为成功，接收参数value，状态改变为fulfilled，不可再次改变。
 // new Promise((resolve, reject)=>{reject(reason)}) reject为失败，接收参数reason，状态改变为rejected，不可再次改变。
-// 若是fn函数报错 直接执行reject();
+// 若是executor函数报错 直接执行reject();
 // 这样我们就直接定义这三个状态
 const PENDING = 'pending';
 const FULFILLED = 'fulfilled';
@@ -20,14 +15,19 @@ const REJECTED = 'rejected';
 
 // 从使用方法来看 Promise 肯定是一个类，我们就用class来声明。
 class Promise {
-  // new Promise 时传入了一个类型为函数的参数 这里就设置为 fn 并且传入就执行
-  constructor(fn) {
+  // new Promise 时传入了一个类型为函数的参数 这里就设置为 executor 并且传入就执行
+  constructor(executor) {
     // 初始化state为等待态
     this.state = PENDING;
     // 成功的值
     this.value = undefined;
     // 失败的原因
     this.reason = undefined;
+
+    // 成功方法储存
+    this.onResolvedCallbacks = [];
+    // 失败方法储存
+    this.onRejectedCallbacks = [];
     // resolve和reject是可执行的，所以都是函数
     // 成功函数
     let resolve = (value) => {
@@ -37,8 +37,10 @@ class Promise {
         this.state = FULFILLED;
         // 储存成功的值
         this.value = value;
+        // 一但resolve执行调用成功数组的函数
+        this.onResolvedCallbacks.forEach(fn=>fn());
       }
-    }
+    };
     
     // 失败函数
     let reject = (reason) => {
@@ -48,37 +50,46 @@ class Promise {
         this.state = REJECTED
         // 储存失败的原因
         this.reason = reason
+        // 一旦reject执行，调用失败数组的函数
+        this.onRejectedCallbacks.forEach(fn=>fn());
       }
-    }
-
-    // fn 里面有两个参数,分别为 resolve和reject
-    // 若是fn函数报错 直接执行reject();
+    };
+    // executor 里面有两个参数,分别为 resolve和reject
+    // 若是executor函数报错 直接执行reject();
     try {
-      fn(resolve,reject)
-    } catch (error) {
-      reject(error)
+      executor(resolve, reject);
+    } catch (err) {
+      reject(err)
     }
   }
 
   // .then
   then(onFulfilled, onRejected) {
-    console.info('state', this.state)
     // 状态为fulfilled，执行onFulfilled，传入成功的值
-    if (this.state === 'fulfilled') {
+    if (this.state === FULFILLED) {
       onFulfilled(this.value);
     };
     // 状态为rejected，执行onRejected，传入失败的原因
-    if (this.state === 'rejected') {
+    if (this.state === REJECTED) {
       onRejected(this.reason);
     };
+    if(this.state === PENDING) {
+      // onFulfilled传入到成功数组
+      this.onResolvedCallbacks.push(()=>{
+        onFulfilled(this.value);
+      })
+      // onRejected传入到失败数组
+      this.onRejectedCallbacks.push(()=>{
+        onRejected(this.reason);
+      })
+    }
   }
 }
 
-const p1 = new Promise((resolve,reject) => {
+new Promise((resolve, reject) => {
   setTimeout(()=>{
-    resolve(1)
-  },100)
-})
-p1.then((res)=>{
+    resolve(111111111)
+  },1000)
+}).then(res=>{
   console.log(res)
-})​​​​
+})
